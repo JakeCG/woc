@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "jest --passWithNoTests",
-    "test:coverage": "jest --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=clover --passWithNoTests",
+    "test:coverage": "jest --coverage --coverageReporters=text --coverageReporters=lcov --testResultsProcessor=jest-sonar-reporter --passWithNoTests",
     "lint": "eslint . && echo 'No linting errors'"
   },
   "jest": {
