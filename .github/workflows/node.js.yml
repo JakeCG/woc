@@ -47,6 +47,3 @@ jobs:
         args: >
           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
           -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-          -Dsonar.sources=src
-          -Dsonar.tests=tests
-          -Dsonar.exclusions=**/*.test.js,**/node_modules/**
