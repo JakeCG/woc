@@ -53,11 +53,10 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.8
+        uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
-          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
         with:
           projectBaseDir: .
           args: >
