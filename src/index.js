@@ -1,27 +1,25 @@
+/*eslint-disable */
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const { BlobServiceClient, StorageSharedKeyCredential } = require('@azure/storage-blob');
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { Upload } = require('@aws-sdk/lib-storage');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const upload = multer({ dest: 'uploads/' });
 
-const sharedKeyCredential = new StorageSharedKeyCredential(
-    process.env.AZURE_STORAGE_ACCOUNT_NAME,
-    process.env.AZURE_STORAGE_ACCOUNT_KEY
-);
-
-const blobServiceClient = new BlobServiceClient(
-    `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
-    sharedKeyCredential
-);
-
-const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_CONTAINER_NAME);
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    }
+});
 
 const filesDataPath = './filesData.json';
 
@@ -50,13 +48,22 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     if (req.file) {
         try {
-            const blobName = req.file.filename;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            const fileStream = fs.createReadStream(req.file.path);
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: req.file.filename,
+                Body: fileStream,
+            };
 
-            await blockBlobClient.uploadFile(req.file.path);
+            const upload = new Upload({
+                client: s3,
+                params: uploadParams,
+            });
+
+            await upload.done();
             fs.unlinkSync(req.file.path); // remove the file locally after upload
 
-            files.push({ name: fileName, key: blobName });
+            files.push({ name: fileName, key: req.file.filename });
             saveFilesData(files);
 
             res.status(200).send('File uploaded successfully.');
@@ -77,8 +84,12 @@ app.delete('/files/:key', async (req, res) => {
     const fileKey = req.params.key;
 
     try {
-        const blockBlobClient = containerClient.getBlockBlobClient(fileKey);
-        await blockBlobClient.delete();
+        const deleteParams = {
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        await s3.send(new DeleteObjectCommand(deleteParams));
 
         files = files.filter(file => file.key !== fileKey);
         saveFilesData(files);
@@ -93,3 +104,5 @@ app.delete('/files/:key', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
