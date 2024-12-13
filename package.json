@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "jest --passWithNoTests",
     "test:coverage": "jest --coverage --coverageReporters=text --coverageReporters=lcov --testResultsProcessor=jest-sonar-reporter --passWithNoTests",
     "lint": "eslint . && echo 'No linting errors'"
@@ -18,10 +19,10 @@
     "testResultsProcessor": "jest-sonar-reporter"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.700.0",
-    "@aws-sdk/lib-storage": "^3.700.0",
+    "@aws-sdk/client-s3": "^3.709.0",
+    "@aws-sdk/lib-storage": "^3.709.0",
     "dotenv": "^8.6.0",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "multer": "^1.4.4"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "globals": "^15.12.0",
     "jest": "^29.7.0",
     "jest-sonar-reporter": "^2.0.0",
+    "nodemon": "^3.1.7",
     "nyc": "^17.1.0"
   }
 }
