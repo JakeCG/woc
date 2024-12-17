@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filevault
+  labels:
+    app: filevault
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: filevault
+  template:
+    metadata:
+      labels:
+        app: filevault
+    spec:
+      containers:
+      - name: filevault-app
+        image: 825765390628.dkr.ecr.us-east-1.amazonaws.com/jakegowler/filevault:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: development
